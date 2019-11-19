@@ -8,4 +8,4 @@ var LikeSchema = Schema({
         publication: { type: Schema.ObjectId, ref: 'Publication' }
 });
 
-module.exports = mongoose.model('Publication', PublicationSchema);
+module.exports = mongoose.model('Like', LikeSchema);
