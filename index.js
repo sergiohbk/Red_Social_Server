@@ -6,7 +6,7 @@ var port = 3900;
 
 //Conectamos a la BD
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/red_social', {useNewUrlParser: true})
+mongoose.connect('mongodb://localhost:27017/red_social', {useUnifiedTopology: true, useNewUrlParser: true})
                 .then(() => {
                     console.log("Conexión correcta");
 
