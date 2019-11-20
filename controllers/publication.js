@@ -59,7 +59,6 @@ function getPublications(req, res) {
             //Buscamos las publicaciones dentro del array
             Publication.find({ user: { "$in": follows_clean } }).sort('-created_at').populate('user').paginate(page, itemsPerPage, (err, publications, total) => {
                 if (err) return res.status(500).send({ message: "Error al devolver publicaciones" });
-
                 if (!publications) return res.status(404).send({ message: "No hay publicaciones" });
                 return res.status(200).send({
                     total_items: total,
