@@ -84,7 +84,7 @@ function getEmmitMessages(req, res) {
 function UnviewedMessages(req, res) {
     var userId = req.user.sub;
 
-    Message.count({ receiver: userId, viewed: 'false' }).exec((err, count) => {
+    Message.countDocuments({ receiver: userId, viewed: 'false' }).exec((err, count) => {
         if (err) return res.status(500).send({ Message: "Error en la petición" });
         res.status(200).send({
             'unviewed': count
