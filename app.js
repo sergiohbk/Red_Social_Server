@@ -5,6 +5,8 @@ var bodyParser = require('body-parser');
 
 //Carga el framework
 var app = express();
+var cors = require('cors');
+
 
 //Cargar rutas
 var user_routes = require('./routes/user');
