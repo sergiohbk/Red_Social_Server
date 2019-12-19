@@ -34,62 +34,27 @@ function pruebas(req, res) {
 }
 //Registro
 function saveUsers(req, res) {
-    //Todos los datos que nos lleguen por POST los guardamos en la variable params
-    var params = req.body;
-    //Creamos un objeto del modelo usuario
-    var user = new User();
+    
+}
 
-    if (params.name && params.nick && params.email && params.password && params.condiciones) {
-        //Seteamos
-        user.name = params.name;
-        user.nick = params.nick;
-        user.email = params.email;
-        user.role = 'ROLE_USER';
-        user.image = null;
-        user.condiciones = params.condiciones;
-
-        //Controlamos los usuarios duplicados
-        User.find({
-            $or: [
-                { email: user.email.toLowerCase() },
-                { nick: user.nick.toLowerCase() }
-            ]
-        }).exec((err, users) => {
-            if (err) return res.status(500).send({ message: "Error en la petición de usuarios" });
-
-            if (users && users.length >= 1) {
-                return res.status(200).send({ message: "El usuario que intentas registrar ya existe" })
-            } else {
-                //Ciframos las password y guarda los datos
-                bcrypt.hash(params.password, null, null, (err, hash) => {
-                    user.password = hash;
-
-                    user.save((err, userStored) => {
-                        if (err) return res.status(500).send({ message: "Error al guardar el usuario" })
-
-                        if (userStored) {
-                            res.status(200).send({ user: userStored });
-                        } else {
-                            res.status(404).send({ message: "No se ha registrado el usaurio" })
-                        }
-                    });
-                });
-            }
-        });
-
-        //Si los datos no llegan correctamente
-    } else {
-        res.status(200).send({
-            message: "Envia todos los campos necesarios!"
-        });
-    }
+function LoginOrRegister(u){
+  User.findOne({ email: u.email.toLowerCase() })
+    .exec((err, user) => {
+        if (err)  console.log("error en el intento de pillar si esta registrado o logeado");
+        if (users && users.length >= 1) {
+            return user;
+          }
+        else {
+          return false;
+        }});
 }
 //Login
 function loginUser(req, res) {
     var params = req.body;
 
-    var email = params.email;
-    var password = params.password;
+    var profile = params.profile;
+
+    var user = LoginOrRegister(profile);
     //Valida que el email este en la base de datos
     User.findOne({ email: email }, (err, user) => {
         if (err) return res.status(500).send({ message: "Error en la petición" });

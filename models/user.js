@@ -7,7 +7,6 @@
         name: String,
         nick: String,
         email: String,
-        password: String,
         role: String,
         image: String,
         condiciones: Boolean
