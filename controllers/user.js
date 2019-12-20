@@ -32,9 +32,10 @@ function pruebas(req, res) {
         message: 'Acción de pruebas en el servidor de nodejs'
     });
 }
-//Registro
-function saveUsers(req, res) {
-    
+//registro
+
+function saveUsers(){
+  return null;
 }
 
 function LoginOrRegister(u){
