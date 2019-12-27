@@ -21,21 +21,31 @@ var jwt = require('../services/jwt');
 //Metodo de pruebas
 function home(req, res) {
     res.status(200).send({
-        message: 'Hola desde el servidor de nodejs'
+        message:"funciona"
     });
 }
 
 //Metodo de pruebas
 function pruebas(req, res) {
-    console.log(req.body)
+    console.log(req.body);
     res.status(200).send({
         message: 'Acción de pruebas en el servidor de nodejs'
     });
 }
 //registro
 
-function saveUsers(){
-  return null;
+function saveUsers(req, res){
+  var user = req.user;
+  console.log(user);
+  if (user) {
+    res.status(200).send({
+      user
+    });
+  }
+  else {
+    res.status(200).send({message: "nada"});
+
+  }
 }
 
 function LoginOrRegister(u){
