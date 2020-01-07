@@ -32,73 +32,82 @@ function pruebas(req, res) {
         message: 'Acción de pruebas en el servidor de nodejs'
     });
 }
-//registro
 
-function saveUsers(req, res){
-  var user = req.user;
-  console.log(user);
-  if (user) {
-    res.status(200).send({
-      user
-    });
-  }
-  else {
-    res.status(200).send({message: "nada"});
+async function LoginOrRegister(u){
 
-  }
-}
-
-function LoginOrRegister(u){
-  User.findOne({ email: u.email.toLowerCase() })
-    .exec((err, user) => {
-        if (err)  console.log("error en el intento de pillar si esta registrado o logeado");
-        if (users && users.length >= 1) {
-            return user;
+  try {
+    var result = await User.findOne({ idAu: u }).exec()
+        .then((user) => {
+          if(!user){
+            user = false;
           }
-        else {
-          return false;
-        }});
+          return user;
+        })
+        .catch((err) => {
+            return handleerror(err);
+        });
+        return {
+           result
+        }
+    } catch (e) {
+        console.log(e);
+    }
 }
 //Login
 function loginUser(req, res) {
-    var params = req.body;
+    var sub = req.user.sub;
 
-    var profile = params.profile;
+    LoginOrRegister(sub).then((user) => {
+      console.log(user.result);
+      if(user.result != null){
+        if(user.result != false){
+          res.status(200).send({message:"logged"});
+        }else {
+          if (sub) {
 
-    var user = LoginOrRegister(profile);
-    //Valida que el email este en la base de datos
-    User.findOne({ email: email }, (err, user) => {
-        if (err) return res.status(500).send({ message: "Error en la petición" });
-        //Compara que la contraseña normal coincida con la contraseña cifrada
-        if (user) {
-            bcrypt.compare(password, user.password, (err, check) => {
-                if (check) {
-                    //Devolvemos y generamos el token con los datos del usuario.
-                    if (params.gettoken) {
-                        return res.status(200).send({
-                            token: jwt.createToken(user)
-                        });
+            var userreg = new User();
 
-                    } else {
-                        //No devolvemos la contraseña para más seguridad
-                        user.password = undefined;
-                        return res.status(200).send({ user })
-                    }
+            userreg.idAu = sub;
+            userreg.name = null;
+            userreg.image = null;
 
-                    //Devolver datos de usuario
-                } else {
-                    return res.status(404).send({ message: "El usaurio no se ha podido identificar" })
-                }
+            userreg.save((err, userStored) =>{
+              if (err) return res.status(500).send({ message: "No ha podido ser registrado" });
+
+              if(userStored){
+                res.status(200).send({message: true});
+              }else {
+                res.status(200).send({message: false});
+              }
+
             });
-        } else {
-            return res.status(404).send({ message: "El usaurio no se ha podido identificar" })
+          }
         }
-    })
+      }else {
+        return res.status(500).send({ message: "Algo falla, no esta logeando" });
+      }
+  });
+}
+
+function getSelfUserData(req, res){
+  var sub = req.user.sub;
+
+  User.findOne({idAu: sub}).exec((err, user) =>{
+    if (err)  return res.status(500).send({ message: "Error en la petición" });
+    if(user){
+      res.status(200).send({
+        _id: user._id,
+        name: user.name,
+        image: user.image
+      });
+    }else {
+      res.status(500).send({message:"error al devolver los datos"});
+    }
+  });
 }
 
 //Conseguir datos de usuario
 function getUser(req, res) {
-    console.log(req);
     var userId = req.params.id;
 
     User.findById(userId, (err, user) => {
@@ -380,8 +389,8 @@ function getImageFile(req, res) {
 module.exports = {
     home,
     pruebas,
-    saveUsers,
     loginUser,
+    getSelfUserData,
     getUser,
     getUsers,
     getCounters,

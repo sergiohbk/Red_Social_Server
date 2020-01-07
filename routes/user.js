@@ -10,9 +10,8 @@ var md_upload = multipart({uploadDir:'./uploads/users'});
 
 //Seleccionamos la ruta y llamamos a los metodos
 api.get('/home', UserController.home);
-api.get('/pruebas', UserController.pruebas);
-api.get('/get-all-information', tokenjwt.checkJwt, UserController.saveUsers);
-api.post('/login', UserController.loginUser);
+api.get('/getSelfUserData', tokenjwt.checkJwt, UserController.getSelfUserData);
+api.post('/login', tokenjwt.checkJwt, UserController.loginUser);
 api.get('/user/:id', UserController.getUser);
 api.get('/users/:page?', UserController.getUsers);
 api.get('/counters/:id?', UserController.getCounters);

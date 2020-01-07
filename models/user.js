@@ -4,12 +4,9 @@
 
  //Modelo usuario
  var UserSchema = Schema({
+        idAu: String,
         name: String,
-        nick: String,
-        email: String,
-        role: String,
-        image: String,
-        condiciones: Boolean
+        image: String
  });
 
  //Pluraliza y pon en minuscula user en la BD y guarda el modelo
