@@ -38,114 +38,26 @@ function savePublication(req, res) {
 }
 
 function getPublications(req, res) {
-    var page = 1;
-    if (req.params.page) {
-        page = req.params.page;
-    }
+  var page = req.params.page;
+  var itemsPerPage = 4;
+  console.log("entra" + req.user.sub);
 
-    // var itemPerPage = 4;
-     var itemsPerPage = 4;
+  Publication.find({ userIdAu: req.user.sub }).sort('-created_at').populate('user').paginate(page, itemsPerPage, (err, publications, total) => {
+    if (err) return res.status(500).send({ message: "Error al devolver las publicaciones" });
+    console.log("error pasado");
+    if (!publications) return res.status(404).send({ message: "No hay publicaciones" });
 
-    //Buscamos a los usuarios que seguimos y los metemos en un array
-    Follow.find({ user: req.user.sub }).populate('followed').exec((err, follows) => {
-        if (err) return res.status(500).send({ message: "Error al devolver el seguimiento" });
-
-        var follows_clean = [];
-
-        follows.forEach((follow) => {
-            follows_clean.push(follow.followed);
-        });
-        follows_clean.push(req.user.sub);
-            //Buscamos las publicaciones dentro del array
-            Publication.find({ user: { "$in": follows_clean } }).sort('-created_at').populate('user').paginate(page, itemsPerPage, (err, publications, total) => {
-                if (err) return res.status(500).send({ message: "Error al devolver publicaciones" });
-                if (!publications) return res.status(404).send({ message: "No hay publicaciones" });
-                return res.status(200).send({
+    return res.status(200).send({
                     total_items: total,
                     pages: Math.ceil(total / itemsPerPage),
                     page: page,
                     items_per_page: itemsPerPage,
                     publications
                 });
-            });
-        });
-//     });
- }
 
-// function getPublications(req, res) {
-//     var page = 1;
-//     if (req.params.page) {
-//         page = req.params.page;
-//     }
-//
-//     var itemsPerPage = 4;
-//     var follows_clean = [];
-//
-//       //Buscamos a los usuarios que seguimos y los metemos en un array
-//
-//     //Buscamos las publicaciones dentro del array
-//     publicationsGet(req).then((value) => {
-//       follows_clean = value;
-//     }).catch((err) => {
-//         return (err);
-//     });
-//     if(follows_clean != [])
-//     getPublicationsOfFollows(follows_clean, page, itemsPerPage, res);
-// }
-//
-// function getPublicationsOfFollows(value, page, itemsPerPage, res){
-//   Publication.find({ user: { "$in": value}}).sort('-created_at').populate('user').paginate(page, itemsPerPage, (err, publications, total) => {
-//       if (err) return res.status(500).send({ message: "Error al devolver publicaciones" });
-//
-//       if (!publications) return res.status(404).send({ message: "No hay publicaciones" });
-//       console.log(value);
-//       console.log("estas son las publicaciones " + total);
-//
-//       return res.status(200).send({
-//         total_items: total,
-//         pages: Math.ceil(total / itemsPerPage),
-//         page: page,
-//         items_per_page: itemsPerPage, publications
-//       });
-//   })
-// }
-//
-// async function publicationsGet(req){
-//   // Follow.find({ user: req.user.sub }).populate('followed').exec((err, follows) => {
-//   //     if (err) return res.status(500).send({ message: "Error al devolver el seguimiento" });
-//   //     follows.forEach( follow => {
-//   //         if (follow.followed){
-//   //           follows_clean.push(follow.followed._id);
-//   //         }
-//   //     });
-//   // });
-// try {
-//     var follows_clean = await Follow.find({ user: req.user.sub }).populate('followed')
-//
-//         .exec()
-//
-//         .then((follows) => {
-//
-//             var follows_clean = [];
-//
-//
-//             follows.forEach((follow) => {
-//               if (follow.followed) {
-//                 follows_clean.push(follow.followed._id);
-//               }
-//             });
-//
-//
-//             return follows_clean;
-//
-//         }).catch((err) => {
-//             return(err);
-//         });
-//       } catch (e) {
-//           console.log(e);
-//       }
-//   return follows_clean;
-// }
+  });
+
+}
 
 function getPublication(req, res) {
     var publicationId = req.params.id;
